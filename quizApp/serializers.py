@@ -96,3 +96,19 @@ class MyQuizListSerializer(serializers.ModelSerializer):
         except QuizTaker.DoesNotExist:
             return None
                 
+
+class QuizResultSerializer(serializers.ModelSerializer):
+    quiztakers_set = serializers.SerializerMethodField()
+    question_set = QuestionSerializer(many=True)
+
+    class Meta:
+        model = Quiz
+        fields = '__all__'
+
+    def get_quiztakers_set(self, obj):
+        try:
+            quiztaker = QuizTaker.objects.get(user=self.context['request'].user, quiz=obj)
+            serializer = QuizTakerSerializer(quiztaker)
+            return serializer.data
+        except QuizTaker.DoesNotExist:
+            return None
